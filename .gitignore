@@ -1,0 +1,7 @@
+.DS_Store
+idf_go_lib/remove_category_associations
+idf_go_lib/create_single_association
+idf_go_lib/idf_go_lib
+
+### IntelliJ Idea ###
+idf_java_lib/.idea/
