@@ -24,11 +24,11 @@ var (
 	service *insights_interface.InsightsService
 )
 
-func create_abac_entity_capability(ext_id string, kind *string, kind_id *string) *insights_interface.UpdateEntityRet {
-	EntityTypeName := constants.ABAC_ENTITY_CAPABILITY
-	KindNameStr := constants.KIND
-	KindIdStr := constants.KIND_ID
-	CategoryIdListStr := constants.CATEGORY_ID_LIST
+func create_abac_entity_capability(ext_id string, kind string, kind_id string) *insights_interface.UpdateEntityRet {
+	ABAC_ENTITY_CAPABILITY := constants.ABAC_ENTITY_CAPABILITY
+	KIND := constants.KIND
+	KIND_ID := constants.KIND_ID
+	CATEGORY_ID_LIST := constants.CATEGORY_ID_LIST
 
 	arg := &insights_interface.GetEntitiesArg{}
 	response := &insights_interface.GetEntitiesRet{}
@@ -46,124 +46,6 @@ func create_abac_entity_capability(ext_id string, kind *string, kind_id *string)
 		fmt.Println("Failed because of error -", err)
 	}
 	// check whether the entity with kind and kind_id exists
-	bool_flag := false
-	ass_id := ""
-	for _, entity := range response.GetEntity() {
-		for _, attrData := range entity.GetAttributeDataMap() {
-			if attrData.GetName() == constants.CATEGORY_ID_LIST {
-				for _, val := range attrData.GetValue().GetStrList().GetValueList() {
-					if val == ext_id {
-						for _, attrData1 := range entity.GetAttributeDataMap() {
-							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == *kind {
-								for _, attrData2 := range entity.GetAttributeDataMap() {
-									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == *kind_id {
-										bool_flag = true
-										ass_id = entity.GetEntityGuid().GetEntityId()
-										fmt.Println("Association exists for kind:", *kind, "and kind_id:", *kind_id, "with entity id:", ass_id)
-										break
-									}
-								}
-							}
-							if bool_flag {
-								break
-							}
-						}
-					}
-					if bool_flag {
-						break
-					}
-				}
-				if bool_flag {
-					break
-				}
-			}
-		}
-		if bool_flag {
-			return nil
-		}
-	}
-
-	// generate a random uuid
-	AssociationId := uuid.New().String()
-
-	update_entity_arg := &insights_interface.UpdateEntityArg{
-		EntityGuid: &insights_interface.EntityGuid{
-			EntityId:       &AssociationId,
-			EntityTypeName: &EntityTypeName,
-		},
-		AttributeDataArgList: []*insights_interface.AttributeDataArg{
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &CategoryIdListStr,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrList_{
-							StrList: &insights_interface.DataValue_StrList{
-								ValueList: []string{ext_id},
-							},
-						},
-					},
-				},
-			},
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &KindNameStr,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: *kind,
-						},
-					},
-				},
-			},
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &KindIdStr,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: *kind_id,
-						},
-					},
-				},
-			},
-		},
-	}
-	// fmt.Println("UpdateEntity request:", proto.MarshalTextString(update_entity_arg))
-
-	// send update entity request
-	update_entity_response := &insights_interface.UpdateEntityRet{}
-	err = service.SendMsgWithTimeout("UpdateEntity", /* service */
-		update_entity_arg, update_entity_response, nil, /* backoff */
-		60 /* timeoutSecs */)
-	if err != nil {
-		fmt.Println("Failed because of error -", err)
-	}
-	return update_entity_response
-}
-
-
-func create_volume_group_entity_capability(ext_id string, kind_id *string) *insights_interface.UpdateEntityRet {
-	EntityTypeName := constants.VOLUME_GROUP_ENTITY_CAPABILITY
-	kind := constants.VOLUMEGROUP_KIND
-	KindNameStr := constants.KIND
-	KindIdStr := constants.KIND_ID
-	CategoryIdListStr := constants.CATEGORY_ID_LIST
-
-	arg := &insights_interface.GetEntitiesArg{}
-	response := &insights_interface.GetEntitiesRet{}
-
-	query := `
-	entity_guid_list {
-		entity_type_name: "abac_entity_capability"
-	}
-	`
-	proto.UnmarshalText(query, arg)
-	err := service.SendMsgWithTimeout("GetEntities", /* service */
-		arg, response, nil, /* backoff */
-		60 /* timeoutSecs */)
-	if err != nil {
-		fmt.Println("Failed because of error -", err)
-	}
-	// check whether the entity with kind and kind_id exists
-	bool_flag := false
 	ass_id := ""
 	for _, entity := range response.GetEntity() {
 		for _, attrData := range entity.GetAttributeDataMap() {
@@ -173,30 +55,17 @@ func create_volume_group_entity_capability(ext_id string, kind_id *string) *insi
 						for _, attrData1 := range entity.GetAttributeDataMap() {
 							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == kind {
 								for _, attrData2 := range entity.GetAttributeDataMap() {
-									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == *kind_id {
-										bool_flag = true
+									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == kind_id {
 										ass_id = entity.GetEntityGuid().GetEntityId()
-										fmt.Println("Association exists for kind:", kind, "and kind_id:", *kind_id, "with entity id:", ass_id)
-										break
+										fmt.Println("Association exists for kind:", kind, "and kind_id:", kind_id, "with entity id:", ass_id)
+										os.Exit(1);
 									}
 								}
 							}
-							if bool_flag {
-								break
-							}
 						}
 					}
-					if bool_flag {
-						break
-					}
-				}
-				if bool_flag {
-					break
 				}
 			}
-		}
-		if bool_flag {
-			return nil
 		}
 	}
 
@@ -206,12 +75,12 @@ func create_volume_group_entity_capability(ext_id string, kind_id *string) *insi
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
 			EntityId:       &AssociationId,
-			EntityTypeName: &EntityTypeName,
+			EntityTypeName: &ABAC_ENTITY_CAPABILITY,
 		},
 		AttributeDataArgList: []*insights_interface.AttributeDataArg{
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &CategoryIdListStr,
+					Name: &CATEGORY_ID_LIST,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrList_{
 							StrList: &insights_interface.DataValue_StrList{
@@ -223,7 +92,7 @@ func create_volume_group_entity_capability(ext_id string, kind_id *string) *insi
 			},
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &KindNameStr,
+					Name: &KIND,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrValue{
 							StrValue: kind,
@@ -233,10 +102,10 @@ func create_volume_group_entity_capability(ext_id string, kind_id *string) *insi
 			},
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &KindIdStr,
+					Name: &KIND_ID,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: *kind_id,
+							StrValue: kind_id,
 						},
 					},
 				},
@@ -256,13 +125,115 @@ func create_volume_group_entity_capability(ext_id string, kind_id *string) *insi
 	return update_entity_response
 }
 
+func create_volume_group_entity_capability(ext_id string, kind_id string) *insights_interface.UpdateEntityRet {
+	VOLUME_GROUP_ENTITY_CAPABILITY := constants.VOLUME_GROUP_ENTITY_CAPABILITY
+	VOLUMEGROUP_KIND := constants.VOLUMEGROUP_KIND
+	KIND := constants.KIND
+	KIND_ID := constants.KIND_ID
+	CATEGORY_ID_LIST := constants.CATEGORY_ID_LIST
 
-func create_filter(ext_id string, kind_id *string) *insights_interface.UpdateEntityRet {
-	EntityTypeName := constants.VOLUME_GROUP_ENTITY_CAPABILITY
-	kind := constants.VOLUMEGROUP_KIND
-	KindNameStr := constants.KIND
-	KindIdStr := constants.KIND_ID
-	CategoryIdListStr := constants.CATEGORY_ID_LIST
+	arg := &insights_interface.GetEntitiesArg{}
+	response := &insights_interface.GetEntitiesRet{}
+
+	query := `
+	entity_guid_list {
+		entity_type_name: "abac_entity_capability"
+	}
+	`
+	proto.UnmarshalText(query, arg)
+	err := service.SendMsgWithTimeout("GetEntities", /* service */
+		arg, response, nil, /* backoff */
+		60 /* timeoutSecs */)
+	if err != nil {
+		fmt.Println("Failed because of error -", err)
+	}
+	// check whether the entity with kind and kind_id exists
+	ass_id := ""
+	for _, entity := range response.GetEntity() {
+		for _, attrData := range entity.GetAttributeDataMap() {
+			if attrData.GetName() == constants.CATEGORY_ID_LIST {
+				for _, val := range attrData.GetValue().GetStrList().GetValueList() {
+					if val == ext_id {
+						for _, attrData1 := range entity.GetAttributeDataMap() {
+							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == VOLUMEGROUP_KIND {
+								for _, attrData2 := range entity.GetAttributeDataMap() {
+									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == kind_id {
+										ass_id = entity.GetEntityGuid().GetEntityId()
+										fmt.Println("Association exists for kind:", VOLUMEGROUP_KIND, "and kind_id:", kind_id, "with entity id:", ass_id)
+										os.Exit(1)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// generate a random uuid
+	AssociationId := uuid.New().String()
+
+	update_entity_arg := &insights_interface.UpdateEntityArg{
+		EntityGuid: &insights_interface.EntityGuid{
+			EntityId:       &AssociationId,
+			EntityTypeName: &VOLUME_GROUP_ENTITY_CAPABILITY,
+		},
+		AttributeDataArgList: []*insights_interface.AttributeDataArg{
+			{
+				AttributeData: &insights_interface.AttributeData{
+					Name: &CATEGORY_ID_LIST,
+					Value: &insights_interface.DataValue{
+						ValueType: &insights_interface.DataValue_StrList_{
+							StrList: &insights_interface.DataValue_StrList{
+								ValueList: []string{ext_id},
+							},
+						},
+					},
+				},
+			},
+			{
+				AttributeData: &insights_interface.AttributeData{
+					Name: &KIND,
+					Value: &insights_interface.DataValue{
+						ValueType: &insights_interface.DataValue_StrValue{
+							StrValue: VOLUMEGROUP_KIND,
+						},
+					},
+				},
+			},
+			{
+				AttributeData: &insights_interface.AttributeData{
+					Name: &KIND_ID,
+					Value: &insights_interface.DataValue{
+						ValueType: &insights_interface.DataValue_StrValue{
+							StrValue: kind_id,
+						},
+					},
+				},
+			},
+		},
+	}
+	// fmt.Println("UpdateEntity request:", proto.MarshalTextString(update_entity_arg))
+
+	// send update entity request
+	update_entity_response := &insights_interface.UpdateEntityRet{}
+	err = service.SendMsgWithTimeout("UpdateEntity", /* service */
+		update_entity_arg, update_entity_response, nil, /* backoff */
+		60 /* timeoutSecs */)
+	if err != nil {
+		fmt.Println("Failed because of error -", err)
+	}
+	return update_entity_response
+}
+
+func create_filter(ext_id string, entity_kind string, entity_uuid string) *insights_interface.UpdateEntityRet {
+	FILTER := constants.FILTER
+	ENTITY_KIND := constants.ENTITY_KIND
+	ENTITY_UUID := constants.ENTITY_UUID
+	CATEGORY := constants.CATEGORY
+	FILTER_EXPRESSIONS_LHS_ENTITY_TYPE := constants.FILTER_EXPRESSIONS_LHS_ENTITY_TYPE
+	FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS := constants.FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS
 
 	arg := &insights_interface.GetEntitiesArg{}
 	response := &insights_interface.GetEntitiesRet{}
@@ -288,12 +259,12 @@ func create_filter(ext_id string, kind_id *string) *insights_interface.UpdateEnt
 				for _, val := range attrData.GetValue().GetStrList().GetValueList() {
 					if val == ext_id {
 						for _, attrData1 := range entity.GetAttributeDataMap() {
-							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == kind {
+							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == entity_kind {
 								for _, attrData2 := range entity.GetAttributeDataMap() {
-									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == *kind_id {
+									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == entity_uuid {
 										bool_flag = true
 										ass_id = entity.GetEntityGuid().GetEntityId()
-										fmt.Println("Association exists for kind:", kind, "and kind_id:", *kind_id, "with entity id:", ass_id)
+										fmt.Println("Association exists for kind:", entity_kind, "and kind_id:", entity_uuid, "with entity id:", ass_id)
 										break
 									}
 								}
@@ -329,12 +300,22 @@ func create_filter(ext_id string, kind_id *string) *insights_interface.UpdateEnt
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
 			EntityId:       &AssociationId,
-			EntityTypeName: &EntityTypeName,
+			EntityTypeName: &FILTER,
 		},
 		AttributeDataArgList: []*insights_interface.AttributeDataArg{
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &CategoryIdListStr,
+					Name: &FILTER_EXPRESSIONS_LHS_ENTITY_TYPE,
+					Value: &insights_interface.DataValue{
+						ValueType: &insights_interface.DataValue_StrValue{
+							StrValue: CATEGORY,
+						},
+					},
+				},
+			},
+			{
+				AttributeData: &insights_interface.AttributeData{
+					Name: &FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrList_{
 							StrList: &insights_interface.DataValue_StrList{
@@ -346,20 +327,20 @@ func create_filter(ext_id string, kind_id *string) *insights_interface.UpdateEnt
 			},
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &KindNameStr,
+					Name: &ENTITY_KIND,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: kind,
+							StrValue: entity_kind,
 						},
 					},
 				},
 			},
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &KindIdStr,
+					Name: &ENTITY_UUID,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: *kind_id,
+							StrValue: entity_uuid,
 						},
 					},
 				},
@@ -379,8 +360,10 @@ func create_filter(ext_id string, kind_id *string) *insights_interface.UpdateEnt
 	return update_entity_response
 }
 
-func create_vm_host_affinity_policy(category_id string, entity_id *string) *insights_interface.UpdateEntityRet {
-	EntityTypeName := constants.VM_HOST_AFFINITY_POLICY
+func create_vm_host_affinity_policy(category_id string, entity_id string) *insights_interface.UpdateEntityRet {
+	VM_HOST_AFFINITY_POLICY := constants.VM_HOST_AFFINITY_POLICY
+	VM_CATEGORY_UUIDS := constants.VM_CATEGORY_UUIDS
+	HOST_CATEGORY_UUIDS := constants.HOST_CATEGORY_UUIDS
 	arg := &insights_interface.GetEntitiesArg{}
 	response := &insights_interface.GetEntitiesRet{}
 
@@ -397,39 +380,40 @@ func create_vm_host_affinity_policy(category_id string, entity_id *string) *insi
 		fmt.Println("Failed because of error -", err)
 	}
 	fmt.Println(proto.MarshalTextString(response))
-	
+
 	for _, entity := range response.GetEntity() {
-		if entity.GetEntityGuid().GetEntityId() == *entity_id {
+		if entity.GetEntityGuid().GetEntityId() == entity_id {
 			for _, attrData := range entity.GetAttributeDataMap() {
-				if attrData.GetName() == "vm_category_uuids" {
+				if attrData.GetName() == constants.VM_CATEGORY_UUIDS {
 					for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 						if value == category_id {
-							return nil
+							fmt.Println("Association exists in ", constants.VM_CATEGORY_UUIDS ," for category_id:", category_id, "with entity id:", entity_id)
+							os.Exit(1)
 						}
 					}
 				}
-				if attrData.GetName() == "host_category_uuids" {
+				if attrData.GetName() == constants.HOST_CATEGORY_UUIDS {
 					for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 						if value == category_id {
-							return nil
+							fmt.Println("Association exists in ", constants.HOST_CATEGORY_UUIDS ," for category_id:", category_id, "with entity id:", entity_id)
+							os.Exit(1)
 						}
 					}
 				}
 			}
 		}
 	}
-	VM_CAT_UUIDS := "vm_category_uuids"
-	HOST_CAT_UUIDS := "host_category_uuids"
+
 	AssociationId := entity_id
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
-			EntityId:       AssociationId,
-			EntityTypeName: &EntityTypeName,
+			EntityId:       &AssociationId,
+			EntityTypeName: &VM_HOST_AFFINITY_POLICY,
 		},
 		AttributeDataArgList: []*insights_interface.AttributeDataArg{
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &VM_CAT_UUIDS,
+					Name: &VM_CATEGORY_UUIDS,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrList_{
 							StrList: &insights_interface.DataValue_StrList{
@@ -441,7 +425,7 @@ func create_vm_host_affinity_policy(category_id string, entity_id *string) *insi
 			},
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &HOST_CAT_UUIDS,
+					Name: &HOST_CATEGORY_UUIDS,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrList_{
 							StrList: &insights_interface.DataValue_StrList{
@@ -450,7 +434,6 @@ func create_vm_host_affinity_policy(category_id string, entity_id *string) *insi
 						},
 					},
 				},
-
 			},
 		},
 	}
@@ -467,8 +450,9 @@ func create_vm_host_affinity_policy(category_id string, entity_id *string) *insi
 	// return nil
 }
 
-func create_vm_anti_affinity_policy(category_id string, entity_id *string) *insights_interface.UpdateEntityRet {
-	EntityTypeName := constants.VM_ANTI_AFFINITY_POLICY
+func create_vm_anti_affinity_policy(category_id string, entity_id string) *insights_interface.UpdateEntityRet {
+	VM_ANTI_AFFINITY_POLICY := constants.VM_ANTI_AFFINITY_POLICY
+	CATEGORY_UUIDS := constants.CATEGORY_UUIDS
 	arg := &insights_interface.GetEntitiesArg{}
 	response := &insights_interface.GetEntitiesRet{}
 
@@ -485,31 +469,32 @@ func create_vm_anti_affinity_policy(category_id string, entity_id *string) *insi
 		fmt.Println("Failed because of error -", err)
 	}
 	fmt.Println(proto.MarshalTextString(response))
-	
+
 	for _, entity := range response.GetEntity() {
-		if entity.GetEntityGuid().GetEntityId() == *entity_id {
+		if entity.GetEntityGuid().GetEntityId() == entity_id {
 			for _, attrData := range entity.GetAttributeDataMap() {
-				if attrData.GetName() == "category_uuids" {
+				if attrData.GetName() == constants.CATEGORY_UUIDS {
 					for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 						if value == category_id {
-							return nil
+							fmt.Println("Association exists in category_uuids for category_id:", category_id, "with entity id:", entity_id)
+							os.Exit(1)
 						}
 					}
 				}
 			}
 		}
 	}
-	CAT_UUIDS := "category_uuids"
+	
 	AssociationId := entity_id
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
-			EntityId:       AssociationId,
-			EntityTypeName: &EntityTypeName,
+			EntityId:       &AssociationId,
+			EntityTypeName: &VM_ANTI_AFFINITY_POLICY,
 		},
 		AttributeDataArgList: []*insights_interface.AttributeDataArg{
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &CAT_UUIDS,
+					Name: &CATEGORY_UUIDS,
 					Value: &insights_interface.DataValue{
 						ValueType: &insights_interface.DataValue_StrList_{
 							StrList: &insights_interface.DataValue_StrList{
@@ -620,10 +605,9 @@ func create_single_association() {
 
 	fmt.Println("Entity ID for category", *category, "is", ext_id)
 
-
 	// create update entity arg
 	EntityTypeName := constants.ABAC_ENTITY_CAPABILITY
-	if *kind == constants.VOLUMEGROUP_KIND{
+	if *kind == constants.VOLUMEGROUP_KIND {
 		EntityTypeName = constants.VOLUME_GROUP_ENTITY_CAPABILITY
 	} else if *kind == constants.VM_HOST_AFFINITY_POLICY {
 		EntityTypeName = constants.VM_HOST_AFFINITY_POLICY
@@ -634,39 +618,37 @@ func create_single_association() {
 	}
 
 	if EntityTypeName == constants.ABAC_ENTITY_CAPABILITY {
-		update_entity_response := create_abac_entity_capability(ext_id, kind, kind_id)
+		update_entity_response := create_abac_entity_capability(ext_id, *kind, *kind_id)
 		fmt.Println("UpdateEntity response:", proto.MarshalTextString(update_entity_response))
 		return
 	} else if EntityTypeName == constants.VOLUME_GROUP_ENTITY_CAPABILITY {
-		update_entity_response := create_volume_group_entity_capability(ext_id, kind_id)
+		update_entity_response := create_volume_group_entity_capability(ext_id, *kind_id)
 		fmt.Println("UpdateEntity response:", proto.MarshalTextString(update_entity_response))
 		return
 	} else if EntityTypeName == constants.FILTER {
-		update_entity_response := create_filter(ext_id, kind_id)
+		update_entity_response := create_filter(ext_id, *kind, *kind_id)
 		fmt.Println("UpdateEntity response:", proto.MarshalTextString(update_entity_response))
 		return
 	} else if EntityTypeName == constants.VM_HOST_AFFINITY_POLICY {
-		update_entity_response := create_vm_host_affinity_policy(ext_id, kind_id)
+		update_entity_response := create_vm_host_affinity_policy(ext_id, *kind_id)
 		fmt.Println("UpdateEntity response:", proto.MarshalTextString(update_entity_response))
 		return
 	} else if EntityTypeName == constants.VM_ANTI_AFFINITY_POLICY {
-		update_entity_response := create_vm_anti_affinity_policy(ext_id, kind_id)
+		update_entity_response := create_vm_anti_affinity_policy(ext_id, *kind_id)
 		fmt.Println("UpdateEntity response:", proto.MarshalTextString(update_entity_response))
 		return
 	}
 
-
-
 }
 
 func remove_vm_anti_affinity_policy_List(ext_id string) []string {
-	EntityTypeName := constants.VM_ANTI_AFFINITY_POLICY
+	VM_ANTI_AFFINITY_POLICY := constants.VM_ANTI_AFFINITY_POLICY
 	// now get all the associations for the category
 	// create get entities arg
 	get_entities_arg := &insights_interface.GetEntitiesArg{
 		EntityGuidList: []*insights_interface.EntityGuid{
 			{
-				EntityTypeName: &EntityTypeName,
+				EntityTypeName: &VM_ANTI_AFFINITY_POLICY,
 			},
 		},
 	}
@@ -682,7 +664,7 @@ func remove_vm_anti_affinity_policy_List(ext_id string) []string {
 		// create a map of string string
 		for _, attrData := range entity.GetAttributeDataMap() {
 			// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-			if attrData.GetName() == "category_uuids" {
+			if attrData.GetName() == constants.CATEGORY_UUIDS {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
 						AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
@@ -695,13 +677,13 @@ func remove_vm_anti_affinity_policy_List(ext_id string) []string {
 }
 
 func remove_vm_host_affinity_policy_List(ext_id string) []string {
-	EntityTypeName := constants.VM_HOST_AFFINITY_POLICY
+	VM_HOST_AFFINITY_POLICY := constants.VM_HOST_AFFINITY_POLICY
 	// now get all the associations for the category
 	// create get entities arg
 	get_entities_arg := &insights_interface.GetEntitiesArg{
 		EntityGuidList: []*insights_interface.EntityGuid{
 			{
-				EntityTypeName: &EntityTypeName,
+				EntityTypeName: &VM_HOST_AFFINITY_POLICY,
 			},
 		},
 	}
@@ -718,7 +700,7 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 		// create a map of string string
 		for _, attrData := range entity.GetAttributeDataMap() {
 			// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-			if attrData.GetName() == "vm_category_uuids" {
+			if attrData.GetName() == constants.VM_CATEGORY_UUIDS {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
 						AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
@@ -727,7 +709,7 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 					}
 				}
 			}
-			if attrData.GetName() == "host_category_uuids" {
+			if attrData.GetName() == constants.HOST_CATEGORY_UUIDS && !bool_flag {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
 						AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
@@ -735,9 +717,6 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 						break
 					}
 				}
-			}
-			if bool_flag {
-				break
 			}
 		}
 	}
@@ -745,13 +724,13 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 }
 
 func remove_volume_group_entity_capability_List(ext_id string) []string {
-	EntityTypeName := constants.VOLUME_GROUP_ENTITY_CAPABILITY
+	VOLUME_GROUP_ENTITY_CAPABILITY := constants.VOLUME_GROUP_ENTITY_CAPABILITY
 	// now get all the associations for the category
 	// create get entities arg
 	get_entities_arg := &insights_interface.GetEntitiesArg{
 		EntityGuidList: []*insights_interface.EntityGuid{
 			{
-				EntityTypeName: &EntityTypeName,
+				EntityTypeName: &VOLUME_GROUP_ENTITY_CAPABILITY,
 			},
 		},
 	}
@@ -767,7 +746,7 @@ func remove_volume_group_entity_capability_List(ext_id string) []string {
 		// create a map of string string
 		for _, attrData := range entity.GetAttributeDataMap() {
 			// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-			if attrData.GetName() == "category_id_list" {
+			if attrData.GetName() == constants.CATEGORY_ID_LIST {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
 						AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
@@ -781,13 +760,13 @@ func remove_volume_group_entity_capability_List(ext_id string) []string {
 }
 
 func remove_abac_entity_capability_List(ext_id string, kind string) []string {
-	EntityTypeName := constants.ABAC_ENTITY_CAPABILITY
+	ABAC_ENTITY_CAPABILITY := constants.ABAC_ENTITY_CAPABILITY
 	// now get all the associations for the category
 	// create get entities arg
 	get_entities_arg := &insights_interface.GetEntitiesArg{
 		EntityGuidList: []*insights_interface.EntityGuid{
 			{
-				EntityTypeName: &EntityTypeName,
+				EntityTypeName: &ABAC_ENTITY_CAPABILITY,
 			},
 		},
 	}
@@ -803,13 +782,14 @@ func remove_abac_entity_capability_List(ext_id string, kind string) []string {
 		// create a map of string string
 		for _, attrData := range entity.GetAttributeDataMap() {
 			// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-			if attrData.GetName() == "category_id_list" {
+			if attrData.GetName() == constants.CATEGORY_ID_LIST {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
 						fmt.Println("entity id:", entity.GetEntityGuid().GetEntityId())
 						for _, attrData1 := range entity.GetAttributeDataMap() {
 							if attrData1.GetName() == "kind" && attrData1.GetValue().GetStrValue() == kind {
 								AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
+								break
 							}
 						}
 					}
@@ -821,13 +801,13 @@ func remove_abac_entity_capability_List(ext_id string, kind string) []string {
 }
 
 func remove_filter_List(ext_id string, kind string) []string {
-	EntityTypeName := constants.FILTER
+	FILTER := constants.FILTER
 	// now get all the associations for the category
 	// create get entities arg
 	get_entities_arg := &insights_interface.GetEntitiesArg{
 		EntityGuidList: []*insights_interface.EntityGuid{
 			{
-				EntityTypeName: &EntityTypeName,
+				EntityTypeName: &FILTER,
 			},
 		},
 	}
@@ -858,7 +838,6 @@ func remove_filter_List(ext_id string, kind string) []string {
 	}
 	return AssociationIdList
 }
-	
 
 func remove_category_associations() {
 	// Define the CLI arguments
@@ -941,64 +920,29 @@ func remove_category_associations() {
 	}
 
 	fmt.Println("Entity ID for category", *category, "is", ext_id)
-	EntityTypeName := constants.ABAC_ENTITY_CAPABILITY
-	if *kind == constants.VOLUMEGROUP_KIND{
+
+	AssociationIdList := []string{}
+	EntityTypeName := ""
+	if *kind == constants.VOLUMEGROUP_KIND {
 		EntityTypeName = constants.VOLUME_GROUP_ENTITY_CAPABILITY
+		AssociationIdList = remove_volume_group_entity_capability_List(ext_id)
 	} else if *kind == constants.VM_HOST_AFFINITY_POLICY {
 		EntityTypeName = constants.VM_HOST_AFFINITY_POLICY
+		AssociationIdList = remove_vm_host_affinity_policy_List(ext_id)
 	} else if *kind == constants.VM_ANTI_AFFINITY_POLICY {
 		EntityTypeName = constants.VM_ANTI_AFFINITY_POLICY
+		AssociationIdList = remove_vm_anti_affinity_policy_List(ext_id)
 	} else if constants.ALLOWED_POLICY_KINDS.Contains(*kind) {
 		EntityTypeName = constants.FILTER
+		AssociationIdList = remove_filter_List(ext_id, *kind)
+	} else if constants.ALLOWED_ENTITY_KINDS.Contains(*kind) {
+		EntityTypeName = constants.ABAC_ENTITY_CAPABILITY
+		AssociationIdList = remove_abac_entity_capability_List(ext_id, *kind)
+	} else {
+		fmt.Println("The kind is not from ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS.")
+		os.Exit(1)
 	}
 
-	// // now get all the associations for the category
-	// // create get entities arg
-	// get_entities_arg := &insights_interface.GetEntitiesArg{
-	// 	EntityGuidList: []*insights_interface.EntityGuid{
-	// 		{
-	// 			EntityTypeName: &EntityTypeName,
-	// 		},
-	// 	},
-	// }
-	// response = &insights_interface.GetEntitiesRet{}
-	// err = service.SendMsgWithTimeout("GetEntities", /* service */
-	// 	get_entities_arg, response, nil, /* backoff */
-	// 	60 /* timeoutSecs */)
-	// if err != nil {
-	// 	fmt.Println("Failed because of error -", err)
-	// }
-	// AssociationIdList := []string{}
-	// for _, entity := range response.GetEntity() {
-	// 	// create a map of string string
-	// 	for _, attrData := range entity.GetAttributeDataMap() {
-	// 		// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-	// 		if attrData.GetName() == "category_id_list" {
-	// 			for _, value := range attrData.GetValue().GetStrList().GetValueList() {
-	// 				if value == ext_id {
-	// 					for _, attrData1 := range entity.GetAttributeDataMap() {
-	// 						if attrData1.GetName() == "kind" && attrData1.GetValue().GetStrValue() == *kind {
-	// 							// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-	// 							AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-	AssociationIdList := []string{}
-	if EntityTypeName == constants.FILTER {
-		AssociationIdList = remove_filter_List(ext_id, *kind)
-	} else if EntityTypeName == constants.ABAC_ENTITY_CAPABILITY {
-		AssociationIdList = remove_abac_entity_capability_List(ext_id, *kind)
-	} else if EntityTypeName == constants.VM_HOST_AFFINITY_POLICY {
-		AssociationIdList = remove_vm_host_affinity_policy_List(ext_id)
-	} else if EntityTypeName == constants.VM_ANTI_AFFINITY_POLICY {
-		AssociationIdList = remove_vm_anti_affinity_policy_List(ext_id)
-	} else if EntityTypeName == constants.VOLUME_GROUP_ENTITY_CAPABILITY {
-		AssociationIdList = remove_volume_group_entity_capability_List(ext_id)
-	}
 	fmt.Println("AssociationIdList:", AssociationIdList)
 
 	for _, AssociationId := range AssociationIdList {
@@ -1026,7 +970,7 @@ func remove_category_associations() {
 
 func main() {
 
-	// create_single_association()
-	remove_category_associations()
+	create_single_association()
+	// remove_category_associations()
 
 }

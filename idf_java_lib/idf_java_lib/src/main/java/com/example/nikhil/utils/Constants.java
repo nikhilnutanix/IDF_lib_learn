@@ -30,7 +30,8 @@ public class Constants {
     public static final String BLUEPRINT_KIND = "blueprint";
     public static final String APP_KIND = "app";
     public static final String VOLUMEGROUP_KIND = "volumegroup";
-    public static final String AFFINITY_RULE_KIND = "vm_host_affinity_policy";
+    public static final String VM_HOST_AFFINITY_POLICY_KIND = "vm_host_affinity_policy";
+    public static final String VM_ANTI_AFFINITY_POLICY_KIND = "vm_anti_affinity_policy";
     public static final String ACTION_RULE_KIND = "action_rule";
 
     public static final String CATEGORY = "category";
@@ -42,6 +43,11 @@ public class Constants {
     public static final String KIND = "kind";
     public static final String KIND_ID = "kind_id";
     public static final String CATEGORY_ID_LIST = "category_id_list";
+    public static final String ENTITY_KIND = "entity_kind";
+    public static final String ENTITY_UUID = "entity_uuid";
+    public static final String CATEGORY_UUIDS = "category_uuids";
+    public static final String VM_CATEGORY_UUIDS = "vm_category_uuids";
+    public static final String HOST_CATEGORY_UUIDS = "host_category_uuids";
 
     // ALLOWED KINDS
 
@@ -72,7 +78,8 @@ public class Constants {
             STORAGE_POLICY_KIND,
             IMAGE_RATE_LIMIT_KIND,
             RECOVERY_PLAN_KIND,
-            AFFINITY_RULE_KIND,
+            VM_HOST_AFFINITY_POLICY_KIND,
+            VM_ANTI_AFFINITY_POLICY_KIND,
             ACTION_RULE_KIND
     );
 }
