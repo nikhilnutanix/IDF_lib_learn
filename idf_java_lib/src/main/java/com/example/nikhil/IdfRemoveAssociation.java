@@ -104,7 +104,7 @@ public class IdfRemoveAssociation implements CommandLineRunner {
             log.error("Error: " + e);
         }
 
-        List<String>AssociationIdList = new ArrayList<>();
+        List<String> AssociationIdList = new ArrayList<>();
 
         assert getEntitiesRet1 != null;
         for (InsightsInterfaceProto.Entity entity : getEntitiesRet1.getEntityList()) {

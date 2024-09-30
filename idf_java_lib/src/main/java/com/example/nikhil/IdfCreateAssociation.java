@@ -97,7 +97,6 @@ public class IdfCreateAssociation implements CommandLineRunner {
         log.info("Category found with ext_id: " + ext_id);
 
 
-
         getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
         entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.ABAC_ENTITY_CAPABILITY)
@@ -150,11 +149,17 @@ public class IdfCreateAssociation implements CommandLineRunner {
             }
         }
 
-
+        String entityTypeName = Constants.ABAC_ENTITY_CAPABILITY;
+        // if kind is a policy kind, then entity type name is policy
+        if (Constants.ALLOWED_POLICY_KINDS.contains(this.kind)) {
+            entityTypeName = Constants.FILTER;
+        } else if (this.kind.equals(Constants.VOLUMEGROUP_KIND)) {
+            entityTypeName = Constants.VOLUME_GROUP_ENTITY_CAPABILITY;
+        }
         // create update entity arg
         UUID AssociationId = UUID.randomUUID();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
-                .setEntityTypeName(Constants.ABAC_ENTITY_CAPABILITY)
+                .setEntityTypeName(entityTypeName)
                 .setEntityId(AssociationId.toString())
                 .build();
 
@@ -193,7 +198,6 @@ public class IdfCreateAssociation implements CommandLineRunner {
                 .build();
 
 
-
 //        log.info("AttributeDataArgBuilder: " + updateEntityArg);
 
         try {
@@ -209,6 +213,7 @@ public class IdfCreateAssociation implements CommandLineRunner {
     public void remove_category_associations() {
 
     }
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -239,7 +244,7 @@ public class IdfCreateAssociation implements CommandLineRunner {
         System.out.println("kind: " + this.kind);
         System.out.println("kind_id: " + this.kind_id);
 
-        create_single_association();
+//        create_single_association();
         exit(0);
     }
 

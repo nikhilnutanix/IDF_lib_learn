@@ -20,28 +20,32 @@ public class Constants {
     public static final String VM_KIND = "vm";
     public static final String MH_VM_KIND = "mh_vm";
     public static final String CLUSTER_KIND = "cluster";
-   public static final String SUBNET_KIND = "subnet";
-   public static final String VIRTUAL_NIC_KIND = "virtual_nic";
-   public static final String HOST_NIC_KIND = "host_nic";
-   public static final String HOST_KIND = "host";
-   public static final String REPORT_KIND = "report";
-   public static final String IMAGE_KIND = "image";
-   public static final String MARKETPLACE_ITEM_KIND = "marketplace_item";
-   public static final String BLUEPRINT_KIND = "blueprint";
-   public static final String APP_KIND = "app";
-   public static final String VOLUMEGROUP_KIND = "volumegroup";
-   public static final String AFFINITY_RULE_KIND = "vm_host_affinity_policy";
-   public static final String ACTION_RULE_KIND = "action_rule";
+    public static final String SUBNET_KIND = "subnet";
+    public static final String VIRTUAL_NIC_KIND = "virtual_nic";
+    public static final String HOST_NIC_KIND = "host_nic";
+    public static final String HOST_KIND = "host";
+    public static final String REPORT_KIND = "report";
+    public static final String IMAGE_KIND = "image";
+    public static final String MARKETPLACE_ITEM_KIND = "marketplace_item";
+    public static final String BLUEPRINT_KIND = "blueprint";
+    public static final String APP_KIND = "app";
+    public static final String VOLUMEGROUP_KIND = "volumegroup";
+    public static final String AFFINITY_RULE_KIND = "vm_host_affinity_policy";
+    public static final String ACTION_RULE_KIND = "action_rule";
 
-   public static final String CATEGORY = "category";
-   public static final String ABAC_ENTITY_CAPABILITY = "abac_entity_capability";
-   public static final String KIND = "kind";
-   public static final String KIND_ID = "kind_id";
-   public static final String CATEGORY_ID_LIST = "category_id_list";
+    public static final String CATEGORY = "category";
+    public static final String ABAC_ENTITY_CAPABILITY = "abac_entity_capability";
+    public static final String FILTER = "filter";
+    public static final String VOLUME_GROUP_ENTITY_CAPABILITY = "volume_group_entity_capability";
+    public static final String VM_HOST_AFFINITY_POLICY = "vm_host_affinity_policy";
+    public static final String VM_ANTI_AFFINITY_POLICY = "vm_anti_affinity_policy";
+    public static final String KIND = "kind";
+    public static final String KIND_ID = "kind_id";
+    public static final String CATEGORY_ID_LIST = "category_id_list";
 
-     // ALLOWED KINDS
+    // ALLOWED KINDS
 
-   public static List <String> ALLOWED_ENTITY_KINDS = Arrays.asList(
+    public static List<String> ALLOWED_ENTITY_KINDS = Arrays.asList(
             VM_KIND,
             MH_VM_KIND,
             CLUSTER_KIND,

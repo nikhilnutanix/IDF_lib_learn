@@ -25,6 +25,7 @@ var ALLOWED_POLICY_KINDS = mapset.NewSetFromSlice(ToSliceOfInterface([]string{
 	IMAGE_RATE_LIMIT_KIND,
 	RECOVERY_PLAN_KIND,
 	POLICY_SCHEMA_KIND,
+	VM_HOST_AFFINITY_POLICY_KIND,
 	VM_ANTI_AFFINITY_POLICY_KIND,
 	ACTION_RULE_KIND,
 }))
@@ -48,6 +49,10 @@ var ALLOWED_ENTITY_KINDS = mapset.NewSetFromSlice(ToSliceOfInterface([]string{
 
 const (
 	ABAC_ENTITY_CAPABILITY = "abac_entity_capability"
+	VOLUME_GROUP_ENTITY_CAPABILITY = "volume_group_entity_capability"
+	FILTER = "filter"
+	VM_HOST_AFFINITY_POLICY = "vm_host_affinity_policy"
+	VM_ANTI_AFFINITY_POLICY = "vm_anti_affinity_policy"
 	KIND = "kind"
 	KIND_ID = "kind_id"
 	CATEGORY_ID_LIST = "category_id_list"
@@ -63,6 +68,7 @@ const (
 	IMAGE_RATE_LIMIT_KIND = "image_rate_limit"
 	RECOVERY_PLAN_KIND = "recovery_plan"
 	POLICY_SCHEMA_KIND = "policy_schema"
+	VM_HOST_AFFINITY_POLICY_KIND = "vm_host_affinity_policy"
 	VM_ANTI_AFFINITY_POLICY_KIND = "vm_anti_affinity_policy"
 	ACTION_RULE_KIND = "action_rule"
 
