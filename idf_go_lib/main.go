@@ -11,9 +11,13 @@ import (
 	"flag"
 	"fmt"
 	"idf_go_lib/constants"
+	protos "idf_go_lib/protos"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
+
+	// "strings"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
@@ -58,7 +62,7 @@ func create_abac_entity_capability(ext_id string, kind string, kind_id string) *
 									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == kind_id {
 										ass_id = entity.GetEntityGuid().GetEntityId()
 										fmt.Println("Association exists for kind:", kind, "and kind_id:", kind_id, "with entity id:", ass_id)
-										os.Exit(1);
+										os.Exit(1)
 									}
 								}
 							}
@@ -229,18 +233,18 @@ func create_volume_group_entity_capability(ext_id string, kind_id string) *insig
 
 func create_filter(ext_id string, entity_kind string, entity_uuid string) *insights_interface.UpdateEntityRet {
 	FILTER := constants.FILTER
-	ENTITY_KIND := constants.ENTITY_KIND
-	ENTITY_UUID := constants.ENTITY_UUID
-	CATEGORY := constants.CATEGORY
-	FILTER_EXPRESSIONS_LHS_ENTITY_TYPE := constants.FILTER_EXPRESSIONS_LHS_ENTITY_TYPE
-	FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS := constants.FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS
+	// ENTITY_KIND := constants.ENTITY_KIND
+	// ENTITY_UUID := constants.ENTITY_UUID
+	// CATEGORY := constants.CATEGORY
+	// FILTER_EXPRESSIONS_LHS_ENTITY_TYPE := constants.FILTER_EXPRESSIONS_LHS_ENTITY_TYPE
+	// FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS := constants.FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS
 
 	arg := &insights_interface.GetEntitiesArg{}
 	response := &insights_interface.GetEntitiesRet{}
 
 	query := `
 	entity_guid_list {
-		entity_type_name: "abac_entity_capability"
+		entity_type_name: "filter"
 	}
 	`
 	proto.UnmarshalText(query, arg)
@@ -251,40 +255,28 @@ func create_filter(ext_id string, entity_kind string, entity_uuid string) *insig
 		fmt.Println("Failed because of error -", err)
 	}
 	// check whether the entity with kind and kind_id exists
-	bool_flag := false
 	ass_id := ""
 	for _, entity := range response.GetEntity() {
 		for _, attrData := range entity.GetAttributeDataMap() {
-			if attrData.GetName() == constants.CATEGORY_ID_LIST {
-				for _, val := range attrData.GetValue().GetStrList().GetValueList() {
-					if val == ext_id {
-						for _, attrData1 := range entity.GetAttributeDataMap() {
-							if attrData1.GetName() == constants.KIND && attrData1.GetValue().GetStrValue() == entity_kind {
-								for _, attrData2 := range entity.GetAttributeDataMap() {
-									if attrData2.GetName() == constants.KIND_ID && attrData2.GetValue().GetStrValue() == entity_uuid {
-										bool_flag = true
-										ass_id = entity.GetEntityGuid().GetEntityId()
-										fmt.Println("Association exists for kind:", entity_kind, "and kind_id:", entity_uuid, "with entity id:", ass_id)
-										break
-									}
-								}
-							}
-							if bool_flag {
-								break
+			if attrData.GetName() == constants.ZPROTOBUF {
+				filterProto := protos.Filter{}
+				err := proto.Unmarshal(attrData.GetValue().GetBytesValue(), &filterProto)
+				if err != nil {
+					fmt.Println("Failed because of error -", err)
+					break
+				}
+				if filterProto.GetEntityUuid() == entity_uuid && filterProto.GetEntityKind() == entity_kind {
+					for _, filterExpression := range filterProto.GetFilterExpressions() {
+						if filterExpression.GetLhsEntityType() == constants.CATEGORY && filterExpression.GetOperator() == protos.FilterExpression_kIn {
+							if strings.Contains(filterExpression.GetEntityUuids(), ext_id) {
+								ass_id = entity.EntityGuid.GetEntityId()
+								fmt.Println("Association already exists with ext_id: ", ass_id)
+								os.Exit(1)
 							}
 						}
 					}
-					if bool_flag {
-						break
-					}
-				}
-				if bool_flag {
-					break
 				}
 			}
-		}
-		if bool_flag {
-			return nil
 		}
 	}
 
@@ -297,6 +289,25 @@ func create_filter(ext_id string, entity_kind string, entity_uuid string) *insig
 	// 		},
 	// 	},
 	// }
+	filterUuid := AssociationId
+	op := protos.FilterExpression_kIn
+	filterProto := protos.Filter{
+		Uuid:       proto.String(filterUuid),
+		EntityUuid: &entity_uuid,
+		EntityKind: &entity_kind,
+		FilterExpressions: []*protos.FilterExpression{
+			{LhsEntityType: proto.String("category"),
+				Operator:    &op,
+				RhsEntities: &protos.FilterExpression_EntityUuids{EntityUuids: ext_id},
+			},
+		},
+	}
+	pb, _ := proto.Marshal(&filterProto)
+	// updateArg := utils.MakeUpdateEntityArgNoCas("filter", filterUuid, map[string]any{
+	// 	"__zprotobuf__": pb,
+	// })
+
+	zproto := "__zprotobuf__"
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
 			EntityId:       &AssociationId,
@@ -305,49 +316,37 @@ func create_filter(ext_id string, entity_kind string, entity_uuid string) *insig
 		AttributeDataArgList: []*insights_interface.AttributeDataArg{
 			{
 				AttributeData: &insights_interface.AttributeData{
-					Name: &FILTER_EXPRESSIONS_LHS_ENTITY_TYPE,
+					Name: &zproto,
 					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: CATEGORY,
+						ValueType: &insights_interface.DataValue_BytesValue{
+							BytesValue: pb,
 						},
 					},
 				},
 			},
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrList_{
-							StrList: &insights_interface.DataValue_StrList{
-								ValueList: []string{ext_id},
-							},
-						},
-					},
-				},
-			},
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &ENTITY_KIND,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: entity_kind,
-						},
-					},
-				},
-			},
-			{
-				AttributeData: &insights_interface.AttributeData{
-					Name: &ENTITY_UUID,
-					Value: &insights_interface.DataValue{
-						ValueType: &insights_interface.DataValue_StrValue{
-							StrValue: entity_uuid,
-						},
-					},
-				},
-			},
+			// {
+			// 	AttributeData: &insights_interface.AttributeData{
+			// 		Name: &ENTITY_KIND,
+			// 		Value: &insights_interface.DataValue{
+			// 			ValueType: &insights_interface.DataValue_StrValue{
+			// 				StrValue: entity_kind,
+			// 			},
+			// 		},
+			// 	},
+			// },
+			// {
+			// 	AttributeData: &insights_interface.AttributeData{
+			// 		Name: &ENTITY_UUID,
+			// 		Value: &insights_interface.DataValue{
+			// 			ValueType: &insights_interface.DataValue_StrValue{
+			// 				StrValue: entity_uuid,
+			// 			},
+			// 		},
+			// 	},
+			// },
 		},
 	}
-	// fmt.Println("UpdateEntity request:", proto.MarshalTextString(update_entity_arg))
+	fmt.Println("UpdateEntity request:", proto.MarshalTextString(update_entity_arg))
 
 	// send update entity request
 	update_entity_response := &insights_interface.UpdateEntityRet{}
@@ -387,7 +386,7 @@ func create_vm_host_affinity_policy(category_id string, entity_id string) *insig
 				if attrData.GetName() == constants.VM_CATEGORY_UUIDS {
 					for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 						if value == category_id {
-							fmt.Println("Association exists in ", constants.VM_CATEGORY_UUIDS ," for category_id:", category_id, "with entity id:", entity_id)
+							fmt.Println("Association exists in ", constants.VM_CATEGORY_UUIDS, " for category_id:", category_id, "with entity id:", entity_id)
 							os.Exit(1)
 						}
 					}
@@ -395,7 +394,7 @@ func create_vm_host_affinity_policy(category_id string, entity_id string) *insig
 				if attrData.GetName() == constants.HOST_CATEGORY_UUIDS {
 					for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 						if value == category_id {
-							fmt.Println("Association exists in ", constants.HOST_CATEGORY_UUIDS ," for category_id:", category_id, "with entity id:", entity_id)
+							fmt.Println("Association exists in ", constants.HOST_CATEGORY_UUIDS, " for category_id:", category_id, "with entity id:", entity_id)
 							os.Exit(1)
 						}
 					}
@@ -484,7 +483,7 @@ func create_vm_anti_affinity_policy(category_id string, entity_id string) *insig
 			}
 		}
 	}
-	
+
 	AssociationId := entity_id
 	update_entity_arg := &insights_interface.UpdateEntityArg{
 		EntityGuid: &insights_interface.EntityGuid{
@@ -820,14 +819,30 @@ func remove_filter_List(ext_id string, kind string) []string {
 	}
 	AssociationIdList := []string{}
 	for _, entity := range response.GetEntity() {
+		// fmt.Println("entity:", proto.MarshalTextString(entity))
 		// create a map of string string
 		for _, attrData := range entity.GetAttributeDataMap() {
-			// fmt.Println("attrData:", proto.MarshalTextString(attrData))
-			if attrData.GetName() == "category_id_list" {
-				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
-					if value == ext_id {
-						for _, attrData1 := range entity.GetAttributeDataMap() {
-							if attrData1.GetName() == "kind" && attrData1.GetValue().GetStrValue() == kind {
+			if attrData.GetName() == constants.ZPROTOBUF {
+				filterProto := protos.Filter{}
+				err := proto.Unmarshal(attrData.GetValue().GetBytesValue(), &filterProto)
+				if err != nil {
+					fmt.Println("Failed because of error -", err)
+					break
+				}
+				// if len(filterProto.GetFilterExpressions()) != 0 && filterProto.GetFilterExpressions()[0].GetLhsEntityType() == constants.CATEGORY {
+				// 	// abc := filterProto.GetFilterExpressions()[0].GetRhsEntities()
+				// 	// a := abc.(*protos.FilterExpression_EntityUuids)
+				// 	// fmt.Println("filterProto:", a.EntityUuids)
+				// 	Entity_uuids := filterProto.GetFilterExpressions()[0].GetRhsEntities().(*protos.FilterExpression_EntityUuids).EntityUuids
+				// 	// check if Entity_uuids string contains ext_id
+				// 	if strings.Contains(Entity_uuids, ext_id) {
+				// 		AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
+				// 	}
+				// }
+				if filterProto.GetEntityKind() == kind {
+					for _, filterExpression := range filterProto.GetFilterExpressions() {
+						if filterExpression.GetLhsEntityType() == constants.CATEGORY && filterExpression.GetOperator() == protos.FilterExpression_kIn {
+							if strings.Contains(filterExpression.GetEntityUuids(), ext_id) {
 								AssociationIdList = append(AssociationIdList, entity.GetEntityGuid().GetEntityId())
 							}
 						}

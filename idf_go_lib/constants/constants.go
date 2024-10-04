@@ -48,6 +48,7 @@ var ALLOWED_ENTITY_KINDS = mapset.NewSetFromSlice(ToSliceOfInterface([]string{
 }))
 
 const (
+	ZPROTOBUF = "__zprotobuf__"
 	ABAC_ENTITY_CAPABILITY = "abac_entity_capability"
 	VOLUME_GROUP_ENTITY_CAPABILITY = "volume_group_entity_capability"
 	FILTER = "filter"
