@@ -18,6 +18,9 @@
   <properties>
     <powermock.version>2.0.7</powermock.version>
     <java.version>1.8</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <protobuf.version>3.21.0</protobuf.version> <!-- Replace with your version -->
   </properties>
 
   <dependencies>
@@ -31,11 +34,13 @@
       <artifactId>util</artifactId>
       <version>17.0.0.1723645976</version>
     </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-        <version>3.12.2</version>
-    </dependency>
+    <!-- Add required Protobuf Java runtime dependencies -->
+<!--    <dependency>-->
+<!--      <groupId>com.google.protobuf</groupId>-->
+<!--      <artifactId>protobuf-java</artifactId>-->
+<!--      <version>3.21.0</version> &lt;!&ndash; Match the protoc version &ndash;&gt;-->
+<!--    </dependency>-->
+
     <dependency>
       <groupId>com.nutanix.nutanix-core.aos-ntnxdb</groupId>
       <artifactId>insights_interface</artifactId>
@@ -55,6 +60,20 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <!-- Protobuf Java Runtime -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.google.protobuf</groupId>-->
+<!--      <artifactId>protobuf-java-util</artifactId>-->
+<!--      <version>3.12.2</version>-->
+<!--    </dependency>-->
+
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -68,6 +87,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.6.0</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -79,6 +105,37 @@
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <!-- Protocol Buffers Maven Plugin -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:3.21.1:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>java</pluginId>
+          <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Add compiler plugin for annotation processing -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <generatedSourcesDirectory>${project.build.directory}/generated-sources/protobuf</generatedSourcesDirectory>
         </configuration>
       </plugin>
     </plugins>

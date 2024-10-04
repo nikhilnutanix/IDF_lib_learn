@@ -5,6 +5,7 @@ import com.example.nikhil.utils.Constants;
 import com.nutanix.insights.exception.InsightsInterfaceException;
 import com.nutanix.insights.insights_interface.InsightsInterface;
 import com.nutanix.insights.ifc.InsightsInterfaceProto;
+import filter.protobuf.FilterOuterClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.CommandLineRunner;
@@ -268,11 +269,21 @@ public class IdfRemoveAssociation implements CommandLineRunner {
         assert getEntitiesRet1 != null;
         for (InsightsInterfaceProto.Entity entity : getEntitiesRet1.getEntityList()) {
             for (InsightsInterfaceProto.NameTimeValuePair entityAttribute : entity.getAttributeDataMapList()) {
-                if (entityAttribute.getName().equals(Constants.CATEGORY_ID_LIST)) {
-                    for (String value : entityAttribute.getValue().getStrList().getValueListList()) {
-                        if (value.equals(ext_id)) {
-                            AssociationIdList.add(entity.getEntityGuid().getEntityId());
-                            break;
+                if (entityAttribute.getName().equals("__zprotobuf__")) {
+                    FilterOuterClass.Filter filter = null;
+                    try {
+                        filter = FilterOuterClass.Filter.parseFrom(entityAttribute.getValue().getBytesValue());
+                    } catch (Exception e) {
+                        log.error("Error: " + e);
+                        break;
+                    }
+                    assert filter != null;
+//                    assert filter.getFilterExpressionsCount() > 0;
+                    for (FilterOuterClass.FilterExpression filterExpression : filter.getFilterExpressionsList()) {
+                        if (filterExpression.getLhsEntityType().equals(Constants.CATEGORY) && filterExpression.getOperator().equals(FilterOuterClass.FilterExpression.Operator.kIn)) {
+                            if (filterExpression.getEntityUuids().contains(ext_id)) {
+                                AssociationIdList.add(entity.getEntityGuid().getEntityId());
+                            }
                         }
                     }
                 }
@@ -365,8 +376,12 @@ public class IdfRemoveAssociation implements CommandLineRunner {
             remove_vm_host_affinity_policy_List(insightsInterface, ext_id);
         } else if (this.kind.equals(Constants.VM_ANTI_AFFINITY_POLICY_KIND)) {
             remove_vm_anti_affinity_policy_List(insightsInterface, ext_id);
-        } else {
+        } else if (Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
             remove_abac_entity_capability_List(insightsInterface, ext_id, this.kind);
+        } else if (Constants.ALLOWED_POLICY_KINDS.contains(this.kind)) {
+            remove_filter_List(insightsInterface, ext_id);
+        } else {
+            log.error("Kind is not in ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS");
         }
 
     }

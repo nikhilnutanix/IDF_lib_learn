@@ -1,0 +1,71 @@
+syntax = "proto2";
+
+package filter.protobuf;
+
+//option go_package = "/protos";
+
+message Filter {
+ // Required - uuid for this filter
+ optional string uuid = 1;
+
+ // Required - uuid for the entity that uses this filter
+ optional string entity_uuid = 2;
+
+ // Required - kind of the entity that uses this filter
+ optional string entity_kind = 3;
+
+ // List of filter expressions
+ repeated FilterExpression filter_expressions = 4;
+
+ // Optional - set if Filter is immutable.
+ optional bool immutable = 5 [default = false];
+
+ // Required - Create time in usecs
+ optional fixed64 create_time_usecs = 6;
+
+ // Required - Last update time in usecs
+ optional fixed64 last_updated_time_usecs = 7;
+
+
+}
+
+message FilterExpression {
+ enum ExpressionType {
+  kScope = 0;
+  kNonScope = 1;
+ }
+
+ enum Operator {
+  kIn = 0;
+  kNotIn = 1;
+  kInAll = 2; //Used for scope type only
+ }
+
+ enum GroupType {
+  kNone= 0;
+  kAll = 1;
+  kSelfOwned = 2;
+ }
+ optional ExpressionType expression_type = 1;
+
+ // lhs, type of the scope (CATEGORY, PROJECT, CLUSTER) or entity
+ optional string lhs_entity_type = 2;
+
+ // operator type
+ optional Operator operator = 3;
+
+ // rhs, can be three types:
+ // 1. entity_uuids that is encoded in to a single string for IDF query purpose
+ //    For instance, ["uuid2", "uuid1"] will be stored as "uuid1:uuid2", UUIDs
+ //    are sorted in order to support substring matches.
+ // 2. "self_owned"
+ // 3. "all"
+ oneof rhs_entities{
+  GroupType group_type = 4;
+
+  string entity_uuids = 5;
+ }
+
+ // Opaque field which can be used to add extra details about the filter.
+ optional string filter_details = 6;
+}
