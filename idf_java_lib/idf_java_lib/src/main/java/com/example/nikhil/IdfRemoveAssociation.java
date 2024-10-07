@@ -1,6 +1,5 @@
 package com.example.nikhil;
 
-
 import com.example.nikhil.utils.Constants;
 import com.nutanix.insights.exception.InsightsInterfaceException;
 import com.nutanix.insights.insights_interface.InsightsInterface;
@@ -31,7 +30,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
     }
 
     public void remove_abac_entity_capability_List(InsightsInterface insightsInterface, String ext_id, String kind) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.ABAC_ENTITY_CAPABILITY)
                 .build();
@@ -53,8 +53,10 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                 if (entityAttribute.getName().equals(Constants.CATEGORY_ID_LIST)) {
                     for (String value : entityAttribute.getValue().getStrList().getValueListList()) {
                         if (value.equals(ext_id)) {
-//                            log.info("Category ID List: " + entityAttribute.getValue().getStrList().getValueListList());
-                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity.getAttributeDataMapList()) {
+                            // log.info("Category ID List: " +
+                            // entityAttribute.getValue().getStrList().getValueListList());
+                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity
+                                    .getAttributeDataMapList()) {
                                 if (entityAttribute1.getName().equals(Constants.KIND)) {
                                     if (entityAttribute1.getValue().getStrValue().equals(kind)) {
                                         AssociationIdList.add(entity.getEntityGuid().getEntityId());
@@ -78,7 +80,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                     .setEntityGuid(entityGuid2)
                     .build();
             try {
-                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface.deleteEntity(deleteEntityArg);
+                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface
+                        .deleteEntity(deleteEntityArg);
                 log.info("DeleteEntityRet: " + deleteEntityRet);
             } catch (InsightsInterfaceException e) {
                 log.error("Error: " + e);
@@ -87,7 +90,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
     }
 
     public void remove_volume_group_entity_capability_List(InsightsInterface insightsInterface, String ext_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VOLUME_GROUP_ENTITY_CAPABILITY)
                 .build();
@@ -127,7 +131,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                     .setEntityGuid(entityGuid2)
                     .build();
             try {
-                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface.deleteEntity(deleteEntityArg);
+                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface
+                        .deleteEntity(deleteEntityArg);
                 log.info("DeleteEntityRet: " + deleteEntityRet);
             } catch (InsightsInterfaceException e) {
                 log.error("Error: " + e);
@@ -136,7 +141,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
     }
 
     public void remove_vm_host_affinity_policy_List(InsightsInterface insightsInterface, String ext_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_HOST_AFFINITY_POLICY)
                 .build();
@@ -191,7 +197,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                     .setEntityGuid(entityGuid2)
                     .build();
             try {
-                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface.deleteEntity(deleteEntityArg);
+                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface
+                        .deleteEntity(deleteEntityArg);
                 log.info("DeleteEntityRet: " + deleteEntityRet);
             } catch (InsightsInterfaceException e) {
                 log.error("Error: " + e);
@@ -200,7 +207,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
     }
 
     public void remove_vm_anti_affinity_policy_List(InsightsInterface insightsInterface, String ext_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_ANTI_AFFINITY_POLICY)
                 .build();
@@ -241,7 +249,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                     .setEntityGuid(entityGuid2)
                     .build();
             try {
-                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface.deleteEntity(deleteEntityArg);
+                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface
+                        .deleteEntity(deleteEntityArg);
                 log.info("DeleteEntityRet: " + deleteEntityRet);
             } catch (InsightsInterfaceException e) {
                 log.error("Error: " + e);
@@ -249,8 +258,9 @@ public class IdfRemoveAssociation implements CommandLineRunner {
         }
     }
 
-    public void remove_filter_List(InsightsInterface insightsInterface, String ext_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void remove_filter_List(InsightsInterface insightsInterface, String ext_id, String entity_kind) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder1 = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.FILTER)
                 .build();
@@ -278,11 +288,14 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                         break;
                     }
                     assert filter != null;
-//                    assert filter.getFilterExpressionsCount() > 0;
-                    for (FilterOuterClass.FilterExpression filterExpression : filter.getFilterExpressionsList()) {
-                        if (filterExpression.getLhsEntityType().equals(Constants.CATEGORY) && filterExpression.getOperator().equals(FilterOuterClass.FilterExpression.Operator.kIn)) {
-                            if (filterExpression.getEntityUuids().contains(ext_id)) {
-                                AssociationIdList.add(entity.getEntityGuid().getEntityId());
+                    // assert filter.getFilterExpressionsCount() > 0;
+                    if (filter.getEntityKind().equals(entity_kind)) {
+                        for (FilterOuterClass.FilterExpression filterExpression : filter.getFilterExpressionsList()) {
+                            if (filterExpression.getLhsEntityType().equals(Constants.CATEGORY) && filterExpression
+                                    .getOperator().equals(FilterOuterClass.FilterExpression.Operator.kIn)) {
+                                if (filterExpression.getEntityUuids().contains(ext_id)) {
+                                    AssociationIdList.add(entity.getEntityGuid().getEntityId());
+                                }
                             }
                         }
                     }
@@ -301,7 +314,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
                     .setEntityGuid(entityGuid2)
                     .build();
             try {
-                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface.deleteEntity(deleteEntityArg);
+                InsightsInterfaceProto.DeleteEntityRet deleteEntityRet = insightsInterface
+                        .deleteEntity(deleteEntityArg);
                 log.info("DeleteEntityRet: " + deleteEntityRet);
             } catch (InsightsInterfaceException e) {
                 log.error("Error: " + e);
@@ -322,16 +336,17 @@ public class IdfRemoveAssociation implements CommandLineRunner {
             log.error("Category is not in key/value format");
             return;
         }
-        //validate kind if it not from ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS
-        if (!Constants.ALLOWED_POLICY_KINDS.contains(this.kind) && !Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
+        // validate kind if it not from ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS
+        if (!Constants.ALLOWED_POLICY_KINDS.contains(this.kind)
+                && !Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
             log.error("Kind is not in ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS");
             return;
         }
 
-
         int port_num = Integer.parseInt(this.port);
         InsightsInterface insightsInterface = new InsightsInterface(this.host, port_num);
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.CATEGORY)
                 .build();
@@ -352,7 +367,8 @@ public class IdfRemoveAssociation implements CommandLineRunner {
         assert getEntitiesRet != null;
         for (InsightsInterfaceProto.Entity entity : getEntitiesRet.getEntityList()) {
             for (InsightsInterfaceProto.NameTimeValuePair entityAttribute : entity.getAttributeDataMapList()) {
-                if (entityAttribute.getName().equals("fq_name") && entityAttribute.getValue().getStrValue().equals(this.category)) {
+                if (entityAttribute.getName().equals("fq_name")
+                        && entityAttribute.getValue().getStrValue().equals(this.category)) {
                     bool_flag = true;
                     ext_id = entity.getEntityGuid().getEntityId();
                     break;
@@ -379,7 +395,7 @@ public class IdfRemoveAssociation implements CommandLineRunner {
         } else if (Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
             remove_abac_entity_capability_List(insightsInterface, ext_id, this.kind);
         } else if (Constants.ALLOWED_POLICY_KINDS.contains(this.kind)) {
-            remove_filter_List(insightsInterface, ext_id);
+            remove_filter_List(insightsInterface, ext_id, this.kind);
         } else {
             log.error("Kind is not in ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS");
         }
@@ -389,34 +405,32 @@ public class IdfRemoveAssociation implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-//        this.args.getOptionNames().forEach(optionName -> {
-////            System.out.println(optionName + " = " + this.args.getOptionValues(optionName));
-//            switch (optionName) {
-//                case "host":
-//                    this.host = this.args.getOptionValues(optionName).get(0);
-//                    break;
-//                case "port":
-//                    this.port = this.args.getOptionValues(optionName).get(0);
-//                    break;
-//                case "category":
-//                    this.category = this.args.getOptionValues(optionName).get(0);
-//                    break;
-//                case "kind":
-//                    this.kind = this.args.getOptionValues(optionName).get(0);
-//                    break;
-//            }
-//        });
-//
-//        System.out.println("host: " + this.host);
-//        System.out.println("port: " + this.port);
-//        System.out.println("category: " + this.category);
-//        System.out.println("kind: " + this.kind);
-//
-//        remove_category_associations();
-//        exit(0);
+        this.args.getOptionNames().forEach(optionName -> {
+            // System.out.println(optionName + " = " +
+            // this.args.getOptionValues(optionName));
+            switch (optionName) {
+                case "host":
+                    this.host = this.args.getOptionValues(optionName).get(0);
+                    break;
+                case "port":
+                    this.port = this.args.getOptionValues(optionName).get(0);
+                    break;
+                case "category":
+                    this.category = this.args.getOptionValues(optionName).get(0);
+                    break;
+                case "kind":
+                    this.kind = this.args.getOptionValues(optionName).get(0);
+                    break;
+            }
+        });
+
+        System.out.println("host: " + this.host);
+        System.out.println("port: " + this.port);
+        System.out.println("category: " + this.category);
+        System.out.println("kind: " + this.kind);
+
+        remove_category_associations();
+        exit(0);
     }
 
 }
-
-
-

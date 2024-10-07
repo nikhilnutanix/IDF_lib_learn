@@ -31,8 +31,10 @@ public class IdfCreateAssociation implements CommandLineRunner {
         this.args = args;
     }
 
-    public void create_abac_entity_capability(InsightsInterface insightsInterface, String ext_id, String kind, String kind_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void create_abac_entity_capability(InsightsInterface insightsInterface, String ext_id, String kind,
+            String kind_id) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.ABAC_ENTITY_CAPABILITY)
                 .build();
@@ -53,10 +55,14 @@ public class IdfCreateAssociation implements CommandLineRunner {
                 if (entityAttribute.getName().equals(Constants.CATEGORY_ID_LIST)) {
                     for (String value : entityAttribute.getValue().getStrList().getValueListList()) {
                         if (value.equals(ext_id)) {
-                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity.getAttributeDataMapList()) {
-                                if (entityAttribute1.getName().equals(Constants.KIND) && entityAttribute1.getValue().getStrValue().equals(kind)) {
-                                    for (InsightsInterfaceProto.NameTimeValuePair entityAttribute2 : entity.getAttributeDataMapList()) {
-                                        if (entityAttribute2.getName().equals(Constants.KIND_ID) && entityAttribute2.getValue().getStrValue().equals(kind_id)) {
+                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity
+                                    .getAttributeDataMapList()) {
+                                if (entityAttribute1.getName().equals(Constants.KIND)
+                                        && entityAttribute1.getValue().getStrValue().equals(kind)) {
+                                    for (InsightsInterfaceProto.NameTimeValuePair entityAttribute2 : entity
+                                            .getAttributeDataMapList()) {
+                                        if (entityAttribute2.getName().equals(Constants.KIND_ID)
+                                                && entityAttribute2.getValue().getStrValue().equals(kind_id)) {
                                             ext_id1 = entity.getEntityGuid().getEntityId();
                                             log.info("Association already exists with ext_id: " + ext_id1);
                                             return;
@@ -103,16 +109,14 @@ public class IdfCreateAssociation implements CommandLineRunner {
                                         .setStrValue(kind_id)
                                         .build())
                                 .build())
-                        .build()
-        );
+                        .build());
 
         InsightsInterfaceProto.UpdateEntityArg updateEntityArg = InsightsInterfaceProto.UpdateEntityArg.newBuilder()
                 .setEntityGuid(entityGuid1)
                 .addAllAttributeDataArgList(attributeDataArgList_)
                 .build();
 
-
-//        log.info("AttributeDataArgBuilder: " + updateEntityArg);
+        // log.info("AttributeDataArgBuilder: " + updateEntityArg);
 
         try {
             InsightsInterfaceProto.UpdateEntityRet updateEntityRet = insightsInterface.updateEntity(updateEntityArg);
@@ -122,8 +126,10 @@ public class IdfCreateAssociation implements CommandLineRunner {
         }
     }
 
-    public void create_volume_group_entity_capability(InsightsInterface insightsInterface, String ext_id, String kind_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void create_volume_group_entity_capability(InsightsInterface insightsInterface, String ext_id,
+            String kind_id) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VOLUME_GROUP_ENTITY_CAPABILITY)
                 .build();
@@ -144,9 +150,12 @@ public class IdfCreateAssociation implements CommandLineRunner {
                 if (entityAttribute.getName().equals(Constants.CATEGORY_ID_LIST)) {
                     for (String value : entityAttribute.getValue().getStrList().getValueListList()) {
                         if (value.equals(ext_id)) {
-                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity.getAttributeDataMapList()) {
-                                for (InsightsInterfaceProto.NameTimeValuePair entityAttribute2 : entity.getAttributeDataMapList()) {
-                                    if (entityAttribute2.getName().equals(Constants.KIND_ID) && entityAttribute2.getValue().getStrValue().equals(kind_id)) {
+                            for (InsightsInterfaceProto.NameTimeValuePair entityAttribute1 : entity
+                                    .getAttributeDataMapList()) {
+                                for (InsightsInterfaceProto.NameTimeValuePair entityAttribute2 : entity
+                                        .getAttributeDataMapList()) {
+                                    if (entityAttribute2.getName().equals(Constants.KIND_ID)
+                                            && entityAttribute2.getValue().getStrValue().equals(kind_id)) {
                                         ext_id1 = entity.getEntityGuid().getEntityId();
                                         log.info("Association already exists with ext_id: " + ext_id1);
                                         return;
@@ -184,8 +193,7 @@ public class IdfCreateAssociation implements CommandLineRunner {
                                         .setStrValue(kind_id)
                                         .build())
                                 .build())
-                        .build()
-        );
+                        .build());
 
         InsightsInterfaceProto.UpdateEntityArg updateEntityArg = InsightsInterfaceProto.UpdateEntityArg.newBuilder()
                 .setEntityGuid(entityGuid1)
@@ -199,11 +207,12 @@ public class IdfCreateAssociation implements CommandLineRunner {
             log.error("Error: " + e);
         }
 
-
     }
 
-    public void create_vm_host_affinity_policy(InsightsInterface insightsInterface, String category_id, String entity_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void create_vm_host_affinity_policy(InsightsInterface insightsInterface, String category_id,
+            String entity_id) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_HOST_AFFINITY_POLICY)
                 .build();
@@ -245,12 +254,11 @@ public class IdfCreateAssociation implements CommandLineRunner {
                 }
             }
         }
-
         // create update entity arg
-        UUID AssociationId = UUID.randomUUID();
+        String AssociationId = entity_id;
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_HOST_AFFINITY_POLICY)
-                .setEntityId(AssociationId.toString())
+                .setEntityId(AssociationId)
                 .build();
 
         List<InsightsInterfaceProto.AttributeDataArg> attributeDataArgList_ = Arrays.asList(
@@ -273,8 +281,7 @@ public class IdfCreateAssociation implements CommandLineRunner {
                                                 .build())
                                         .build())
                                 .build())
-                        .build()
-        );
+                        .build());
 
         InsightsInterfaceProto.UpdateEntityArg updateEntityArg = InsightsInterfaceProto.UpdateEntityArg.newBuilder()
                 .setEntityGuid(entityGuid1)
@@ -290,8 +297,10 @@ public class IdfCreateAssociation implements CommandLineRunner {
 
     }
 
-    public void create_vm_anti_affinity_policy(InsightsInterface insightsInterface, String category_id, String entity_id) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void create_vm_anti_affinity_policy(InsightsInterface insightsInterface, String category_id,
+            String entity_id) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_ANTI_AFFINITY_POLICY)
                 .build();
@@ -324,10 +333,10 @@ public class IdfCreateAssociation implements CommandLineRunner {
         }
 
         // create update entity arg
-        UUID AssociationId = UUID.randomUUID();
+        String AssociationId = entity_id;
         InsightsInterfaceProto.EntityGuid entityGuid1 = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.VM_ANTI_AFFINITY_POLICY)
-                .setEntityId(AssociationId.toString())
+                .setEntityId(AssociationId)
                 .build();
 
         List<InsightsInterfaceProto.AttributeDataArg> attributeDataArgList_ = Arrays.asList(
@@ -340,8 +349,7 @@ public class IdfCreateAssociation implements CommandLineRunner {
                                                 .build())
                                         .build())
                                 .build())
-                        .build()
-        );
+                        .build());
 
         InsightsInterfaceProto.UpdateEntityArg updateEntityArg = InsightsInterfaceProto.UpdateEntityArg.newBuilder()
                 .setEntityGuid(entityGuid1)
@@ -356,8 +364,10 @@ public class IdfCreateAssociation implements CommandLineRunner {
         }
     }
 
-    public void create_filter(InsightsInterface insightsInterface, String ext_id, String entity_kind, String entity_uuid) {
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+    public void create_filter(InsightsInterface insightsInterface, String ext_id, String entity_kind,
+            String entity_uuid) {
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.FILTER)
                 .build();
@@ -384,16 +394,16 @@ public class IdfCreateAssociation implements CommandLineRunner {
                         break;
                     }
                     assert filter != null;
-                    if (!filter.getEntityUuid().equals(entity_uuid)) {
-                        break;
-                    }
-//                    assert filter.getFilterExpressionsCount() > 0;
-                    for (FilterOuterClass.FilterExpression filterExpression : filter.getFilterExpressionsList()) {
-                        if (filterExpression.getLhsEntityType().equals(Constants.CATEGORY) && filterExpression.getOperator().equals(FilterOuterClass.FilterExpression.Operator.kIn)) {
-                            if (filterExpression.getEntityUuids().contains(ext_id)) {
-                                ext_id1 = entity.getEntityGuid().getEntityId();
-                                log.info("Association already exists with ext_id: " + ext_id1);
-                                return;
+                    if (filter.getEntityUuid().equals(entity_uuid) && filter.getEntityKind().equals(entity_kind)) {
+                        // assert filter.getFilterExpressionsCount() > 0;
+                        for (FilterOuterClass.FilterExpression filterExpression : filter.getFilterExpressionsList()) {
+                            if (filterExpression.getLhsEntityType().equals(Constants.CATEGORY) && filterExpression
+                                    .getOperator().equals(FilterOuterClass.FilterExpression.Operator.kIn)) {
+                                if (filterExpression.getEntityUuids().contains(ext_id)) {
+                                    ext_id1 = entity.getEntityGuid().getEntityId();
+                                    log.info("Association already exists with ext_id: " + ext_id1);
+                                    return;
+                                }
                             }
                         }
                     }
@@ -417,7 +427,8 @@ public class IdfCreateAssociation implements CommandLineRunner {
         // create update entity arg for filter
         // serialize filter to byte array
 
-        InsightsInterfaceProto.AttributeData.Builder attributeDataBuilder = InsightsInterfaceProto.AttributeData.newBuilder()
+        InsightsInterfaceProto.AttributeData.Builder attributeDataBuilder = InsightsInterfaceProto.AttributeData
+                .newBuilder()
                 .setName("__zprotobuf__")
                 .setValue(InsightsInterfaceProto.DataValue.newBuilder()
                         .setBytesValue(filter.toByteString())
@@ -432,32 +443,32 @@ public class IdfCreateAssociation implements CommandLineRunner {
                 InsightsInterfaceProto.AttributeDataArg.newBuilder()
                         .setAttributeData(attributeDataBuilder)
                         .build()
-//                InsightsInterfaceProto.AttributeDataArg.newBuilder()
-//                        .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
-//                                .setName("filter_expressions.lhs_entity_id")
-//                                .setValue(InsightsInterfaceProto.DataValue.newBuilder()
-//                                        .setStrList(InsightsInterfaceProto.DataValue.StrList.newBuilder()
-//                                                .addAllValueList(Arrays.asList(ext_id))
-//                                                .build())
-//                                        .build())
-//                                .build())
-//                        .build(),
-//                InsightsInterfaceProto.AttributeDataArg.newBuilder()
-//                        .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
-//                                .setName("kind")
-//                                .setValue(InsightsInterfaceProto.DataValue.newBuilder()
-//                                        .setStrValue(entity_kind)
-//                                        .build())
-//                                .build())
-//                        .build(),
-//                InsightsInterfaceProto.AttributeDataArg.newBuilder()
-//                        .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
-//                                .setName("entity_uuid")
-//                                .setValue(InsightsInterfaceProto.DataValue.newBuilder()
-//                                        .setStrValue(entity_uuid)
-//                                        .build())
-//                                .build())
-//                        .build()
+        // InsightsInterfaceProto.AttributeDataArg.newBuilder()
+        // .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
+        // .setName("filter_expressions.lhs_entity_id")
+        // .setValue(InsightsInterfaceProto.DataValue.newBuilder()
+        // .setStrList(InsightsInterfaceProto.DataValue.StrList.newBuilder()
+        // .addAllValueList(Arrays.asList(ext_id))
+        // .build())
+        // .build())
+        // .build())
+        // .build(),
+        // InsightsInterfaceProto.AttributeDataArg.newBuilder()
+        // .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
+        // .setName("kind")
+        // .setValue(InsightsInterfaceProto.DataValue.newBuilder()
+        // .setStrValue(entity_kind)
+        // .build())
+        // .build())
+        // .build(),
+        // InsightsInterfaceProto.AttributeDataArg.newBuilder()
+        // .setAttributeData(InsightsInterfaceProto.AttributeData.newBuilder()
+        // .setName("entity_uuid")
+        // .setValue(InsightsInterfaceProto.DataValue.newBuilder()
+        // .setStrValue(entity_uuid)
+        // .build())
+        // .build())
+        // .build()
         );
 
         InsightsInterfaceProto.UpdateEntityArg updateEntityArg = InsightsInterfaceProto.UpdateEntityArg.newBuilder()
@@ -471,7 +482,6 @@ public class IdfCreateAssociation implements CommandLineRunner {
         } catch (InsightsInterfaceException e) {
             log.error("Error: " + e);
         }
-
 
     }
 
@@ -488,13 +498,14 @@ public class IdfCreateAssociation implements CommandLineRunner {
             log.error("Category is not in key/value format");
             return;
         }
-        //validate kind if it not from ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS
-        if (!Constants.ALLOWED_POLICY_KINDS.contains(this.kind) && !Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
+        // validate kind if it not from ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS
+        if (!Constants.ALLOWED_POLICY_KINDS.contains(this.kind)
+                && !Constants.ALLOWED_ENTITY_KINDS.contains(this.kind)) {
             log.error("Kind is not in ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS");
             return;
         }
 
-        //validate kind_id if it is not empty
+        // validate kind_id if it is not empty
         if (this.kind_id.isEmpty()) {
             log.error("Kind_id is empty");
             return;
@@ -502,7 +513,8 @@ public class IdfCreateAssociation implements CommandLineRunner {
 
         int port_num = Integer.parseInt(this.port);
         InsightsInterface insightsInterface = new InsightsInterface(this.host, port_num);
-        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg.newBuilder();
+        InsightsInterfaceProto.GetEntitiesArg.Builder getEntitiesArgBuilder = InsightsInterfaceProto.GetEntitiesArg
+                .newBuilder();
         InsightsInterfaceProto.EntityGuid entityGuid = InsightsInterfaceProto.EntityGuid.newBuilder()
                 .setEntityTypeName(Constants.CATEGORY)
                 .build();
@@ -523,7 +535,8 @@ public class IdfCreateAssociation implements CommandLineRunner {
         assert getEntitiesRet != null;
         for (InsightsInterfaceProto.Entity entity : getEntitiesRet.getEntityList()) {
             for (InsightsInterfaceProto.NameTimeValuePair entityAttribute : entity.getAttributeDataMapList()) {
-                if (entityAttribute.getName().equals("fq_name") && entityAttribute.getValue().getStrValue().equals(this.category)) {
+                if (entityAttribute.getName().equals("fq_name")
+                        && entityAttribute.getValue().getStrValue().equals(this.category)) {
                     bool_flag = true;
                     ext_id = entity.getEntityGuid().getEntityId();
                     break;
@@ -555,41 +568,41 @@ public class IdfCreateAssociation implements CommandLineRunner {
             log.error("Kind is not in ALLOWED_POLICY_KINDS or ALLOWED_ENTITY_KINDS");
         }
 
-
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        this.args.getOptionNames().forEach(optionName -> {
-//            System.out.println(optionName + " = " + this.args.getOptionValues(optionName));
-            switch (optionName) {
-                case "host":
-                    this.host = this.args.getOptionValues(optionName).get(0);
-                    break;
-                case "port":
-                    this.port = this.args.getOptionValues(optionName).get(0);
-                    break;
-                case "category":
-                    this.category = this.args.getOptionValues(optionName).get(0);
-                    break;
-                case "kind":
-                    this.kind = this.args.getOptionValues(optionName).get(0);
-                    break;
-                case "kind_id":
-                    this.kind_id = this.args.getOptionValues(optionName).get(0);
-                    break;
-            }
-        });
+        // this.args.getOptionNames().forEach(optionName -> {
+        //     // System.out.println(optionName + " = " +
+        //     // this.args.getOptionValues(optionName));
+        //     switch (optionName) {
+        //         case "host":
+        //             this.host = this.args.getOptionValues(optionName).get(0);
+        //             break;
+        //         case "port":
+        //             this.port = this.args.getOptionValues(optionName).get(0);
+        //             break;
+        //         case "category":
+        //             this.category = this.args.getOptionValues(optionName).get(0);
+        //             break;
+        //         case "kind":
+        //             this.kind = this.args.getOptionValues(optionName).get(0);
+        //             break;
+        //         case "kind_id":
+        //             this.kind_id = this.args.getOptionValues(optionName).get(0);
+        //             break;
+        //     }
+        // });
 
-        System.out.println("host: " + this.host);
-        System.out.println("port: " + this.port);
-        System.out.println("category: " + this.category);
-        System.out.println("kind: " + this.kind);
-        System.out.println("kind_id: " + this.kind_id);
+        // System.out.println("host: " + this.host);
+        // System.out.println("port: " + this.port);
+        // System.out.println("category: " + this.category);
+        // System.out.println("kind: " + this.kind);
+        // System.out.println("kind_id: " + this.kind_id);
 
-        create_single_association();
-        exit(0);
+        // create_single_association();
+        // exit(0);
     }
 
 }
