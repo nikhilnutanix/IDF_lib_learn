@@ -141,7 +141,7 @@ func create_volume_group_entity_capability(ext_id string, kind_id string) *insig
 
 	query := `
 	entity_guid_list {
-		entity_type_name: "abac_entity_capability"
+		entity_type_name: "volume_group_entity_capability"
 	}
 	`
 	proto.UnmarshalText(query, arg)
@@ -378,7 +378,7 @@ func create_vm_host_affinity_policy(category_id string, entity_id string) *insig
 	if err != nil {
 		fmt.Println("Failed because of error -", err)
 	}
-	fmt.Println(proto.MarshalTextString(response))
+	// fmt.Println(proto.MarshalTextString(response))
 
 	for _, entity := range response.GetEntity() {
 		if entity.GetEntityGuid().GetEntityId() == entity_id {
@@ -467,7 +467,7 @@ func create_vm_anti_affinity_policy(category_id string, entity_id string) *insig
 	if err != nil {
 		fmt.Println("Failed because of error -", err)
 	}
-	fmt.Println(proto.MarshalTextString(response))
+	// fmt.Println(proto.MarshalTextString(response))
 
 	for _, entity := range response.GetEntity() {
 		if entity.GetEntityGuid().GetEntityId() == entity_id {

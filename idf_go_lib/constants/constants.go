@@ -61,7 +61,7 @@ const (
 	ENTITY_UUID = "entity_uuid"
 	CATEGORY_UUIDS = "category_uuids"
 	VM_CATEGORY_UUIDS = "vm_category_uuids"
-	HOST_CATEGORY_UUIDS = "HOST_category_uuids"
+	HOST_CATEGORY_UUIDS = "host_category_uuids"
 	FILTER_EXPRESSIONS_LHS_ENTITY_TYPE = "filter_expressions.lhs_entity_type"
 	FILTER_EXPRESSIONS_RHS_ENTITY_UUIDS = "filter_expressions.rhs_entity_uuids"
 	CATEGORY_ID_LIST = "category_id_list"
