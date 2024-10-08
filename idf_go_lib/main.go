@@ -708,6 +708,9 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 					}
 				}
 			}
+			if bool_flag {
+				break
+			}
 			if attrData.GetName() == constants.HOST_CATEGORY_UUIDS && !bool_flag {
 				for _, value := range attrData.GetValue().GetStrList().GetValueList() {
 					if value == ext_id {
@@ -716,6 +719,9 @@ func remove_vm_host_affinity_policy_List(ext_id string) []string {
 						break
 					}
 				}
+			}
+			if bool_flag {
+				break
 			}
 		}
 	}
@@ -985,7 +991,7 @@ func remove_category_associations() {
 
 func main() {
 
-	create_single_association()
-	// remove_category_associations()
+	// create_single_association()
+	remove_category_associations()
 
 }
